@@ -8,3 +8,6 @@ install:
 
 compile:
 	ant debug
+
+logcat:
+	adb logcat -s COS:*
