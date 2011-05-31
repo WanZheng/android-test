@@ -34,6 +34,10 @@ public class test_for_surfaceview extends Activity
 	FrameLayout layout = new FrameLayout(this);
 	final RectView view = new RectView(this);
 	layout.addView(view);
+	TranslateAnimation a = new TranslateAnimation(0.0f, 0.0f, 0.0f, 0.0f);
+	a.setDuration(2*1000);
+	a.setRepeatCount(Animation.INFINITE);
+	// layout.startAnimation(a);
 
 	FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
 	layoutParams.width = 100;
@@ -41,10 +45,8 @@ public class test_for_surfaceview extends Activity
 	layoutParams.gravity = Gravity.CENTER;
 	view.setLayoutParams(layoutParams);
 
-	/*
 	RotateAnimation animation = new RotateAnimation(-10.0f, 10.0f, layoutParams.width/2, layoutParams.height/2);
-	*/
-	TranslateAnimation animation = new TranslateAnimation(-50.0f, -20.0f, 50.0f, 20.0f);
+	// TranslateAnimation animation = new TranslateAnimation(-50.0f, -20.0f, 50.0f, 20.0f);
 
 	animation.setDuration(2 * 1000);
 	animation.setRepeatCount(Animation.INFINITE);
