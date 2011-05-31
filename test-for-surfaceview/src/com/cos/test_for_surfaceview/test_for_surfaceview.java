@@ -2,6 +2,8 @@ package com.cos.test_for_surfaceview;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
@@ -15,11 +17,14 @@ import android.graphics.PaintFlagsDrawFilter;
 import android.content.Context;
 import android.util.Log;
 import android.view.animation.RotateAnimation;
+import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation;
 import android.view.MotionEvent;
 
 public class test_for_surfaceview extends Activity
 {
+    private Runnable mTimerTask;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -27,7 +32,7 @@ public class test_for_surfaceview extends Activity
         super.onCreate(savedInstanceState);
 
 	FrameLayout layout = new FrameLayout(this);
-	RectView view = new RectView(this);
+	final RectView view = new RectView(this);
 	layout.addView(view);
 
 	FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
@@ -36,13 +41,35 @@ public class test_for_surfaceview extends Activity
 	layoutParams.gravity = Gravity.CENTER;
 	view.setLayoutParams(layoutParams);
 
+	/*
 	RotateAnimation animation = new RotateAnimation(-10.0f, 10.0f, layoutParams.width/2, layoutParams.height/2);
+	*/
+	TranslateAnimation animation = new TranslateAnimation(-50.0f, -20.0f, 50.0f, 20.0f);
+
 	animation.setDuration(2 * 1000);
 	animation.setRepeatCount(Animation.INFINITE);
 	animation.setRepeatMode(Animation.REVERSE);
 	view.startAnimation(animation);
 
         setContentView(layout);
+	Log.d("COS", "cached? = " + layout.isAnimationCacheEnabled());
+
+	layout.setOnTouchListener(new View.OnTouchListener() {
+		@Override public boolean onTouch(View v, MotionEvent event){
+		    final Handler handler = v.getHandler();
+		    if (mTimerTask == null) {
+			mTimerTask = new Runnable() {
+				@Override public void run() {
+				    Log.d("COS", "now="+SystemClock.uptimeMillis()+" count="+view.getCount());
+				    view.resetCount();
+				    handler.postAtTime(this, SystemClock.uptimeMillis() + 1*1000);
+				}
+			    };
+			handler.postAtTime(mTimerTask, SystemClock.uptimeMillis());
+		    }
+		    return true;
+		}
+	    });
     }
 
     /*
@@ -76,18 +103,9 @@ public class test_for_surfaceview extends Activity
 	}
 
 	@Override protected void onDraw(Canvas canvas) {
-	    /*
-	    PaintFlagsDrawFilter filter = new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG);
-	    canvas.setDrawFilter( filter );
-	    */
+	    mPaint.setColor(mCount % 2 == 0 ? Color.RED : Color.BLUE);
 	    canvas.drawRect(0, 0, getWidth(), getHeight(), mPaint);
 	    mCount++;
-	}
-
-	@Override public boolean onTouchEvent(MotionEvent event) {
-	    Log.d("COS", "count="+getCount());
-	    resetCount();
-	    return super.onTouchEvent(event);
 	}
 
 	public int getCount() { return mCount; }
