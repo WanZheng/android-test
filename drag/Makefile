@@ -1,6 +1,6 @@
-all:	run
+all:	log
 
-bin/drag-debug.apk:
+bin/drag-debug.apk:	force
 	ant debug
 
 install:	bin/drag-debug.apk
@@ -8,3 +8,8 @@ install:	bin/drag-debug.apk
 
 run:	install
 	adb shell am start -n drag.cos/.drag
+
+log:	run
+	adb logcat -s cos:*
+
+force:
