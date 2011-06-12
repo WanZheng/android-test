@@ -23,7 +23,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation;
 import android.view.MotionEvent;
 
-class DragHost extends FrameLayout {
+class DragHost extends ViewGroup {
     private View mHostedView;
     private View mDragItem;
 
@@ -37,6 +37,11 @@ class DragHost extends FrameLayout {
 	}
 	mHostedView = hostedView;
 	addView(hostedView);
+    }
+
+    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+	measureChildren(widthMeasureSpec, heightMeasureSpec);
+	super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override protected void onLayout(boolean changed, int l, int t, int r, int b) {
