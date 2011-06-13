@@ -28,13 +28,14 @@ import android.view.MotionEvent;
 import java.util.ArrayList;
 
 public class DragController {
-    private String TAG = "drag";
+    private final static String TAG = "drag";
 
     private View mHostedView;
     private View mDragItem;
     private AbsoluteLayout mHost;
     private DragInfo mDragInfo;
     private ArrayList<DropTarget> mDropTargets = new ArrayList<DropTarget>();
+    private DropTarget mCurrentDropTarget;
     private DragSource mDragSource;
 
     private OnTouchListener mOnTouchListener = new OnTouchListener();
@@ -46,17 +47,21 @@ public class DragController {
 
     public void startDrag(DragSource source, Rect rect, DragInfo dragInfo) throws Exception {
 	if (mDragSource != null) {
-	    throw new Exception("Is draging already");
+	    throw new Exception("Is draging already, mDragSource="+mDragSource);
 	}
 
+	mDragSource = source;
+
 	mDragInfo = dragInfo;
+	mCurrentDropTarget = null; // TODO: find a drop target
 
 	// TODO: create item according to dragInfo
-	mDragItem = new RectView(mHost.getContext(), Color.YELLOW);
+	mDragItem = new RectView(mHost.getContext(), Color.argb(0x80, 0xff, 0xff, 0x00));
 	mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(20, 30, 50, 100));
 	mHost.addView(mDragItem);
 
 	mHost.setOnTouchListener(mOnTouchListener);
+	Log.d(TAG, "startDrag(source="+mDragSource+")");
     }
 
     public void cancelDrag() {
@@ -82,16 +87,27 @@ public class DragController {
     /* Private */
     private class OnTouchListener implements View.OnTouchListener {
 	@Override public boolean onTouch(View v, MotionEvent event) {
+	    int x = (int)event.getX();
+	    int y = (int)event.getY();
+
+	    DropTarget target = findDropTarget(x, y);
+	    Rect rect = new Rect(x, y, 50+x, 25+y);
+
 	    switch (event.getAction()) {
 	    case MotionEvent.ACTION_DOWN:
 		Log.d(TAG, "down");
 		break;
 	    case MotionEvent.ACTION_MOVE:
-		Log.d(TAG, "move");
+		if (mCurrentDropTarget != target) {
+		    enterDropTarget(target, rect);
+		}
+
 		mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(20, 30, (int)event.getX(), (int)event.getY()));
+		target.onDragOver(rect, mDragInfo);
 		break;
 	    case MotionEvent.ACTION_UP:
 		Log.d(TAG, "up");
+		endDrop(x, y);
 		break;
 	    case MotionEvent.ACTION_CANCEL:
 		Log.d(TAG, "cancel");
@@ -101,34 +117,40 @@ public class DragController {
 	}
     }
 
-    private boolean drop(int x, int y) {
-	Rect rect = null; // TODO
-
-	DropTarget target = findDropTarget(x, y);
-	if (target != null) {
-	    target.onDragExit(mDragInfo);
-	    if (target.acceptDrop(rect, mDragInfo)) {
-		target.onDrop(rect, mDragInfo);
-		mDragSource.onDropCompleted(true);
-	    }else{
-		mDragSource.onDropCompleted(false);
-	    }
-	    return true;
-	}else{
-	    return false;
+    private void enterDropTarget(DropTarget target, Rect rect) {
+	if (mCurrentDropTarget != null) {
+	    mCurrentDropTarget.onDragExit(mDragInfo);
 	}
+
+	target.onDragEnter(rect, mDragInfo);
+	mCurrentDropTarget = target;
     }
 
-    private void endDrop() throws Exception {
+    private void endDrop(int x, int y) {
 	if (mDragSource == null){
-	    throw new Exception("Not draging right now");
+	    Log.e(TAG, "is not draging");
+	}else{
+	    Rect rect = new Rect(x, y, x+25, y+50);
+
+	    DropTarget target = findDropTarget(x, y);
+	    if (target != null) {
+		target.onDragExit(mDragInfo);
+		if (target.acceptDrop(rect, mDragInfo)) {
+		    target.onDrop(rect, mDragInfo);
+		    mDragSource.onDropCompleted(true);
+		}else{
+		    mDragSource.onDropCompleted(false);
+		}
+	    }
+
+	    mHost.setOnTouchListener(null);
+	    mDragSource = null;
+	    Log.d(TAG, "set source to " + mDragSource);
 	}
-	mHost.setOnTouchListener(null);
-	mDragSource = null;
     }
 
     private DropTarget findDropTarget(int x, int y) {
 	// TODO
-	return null;
+	return mDropTargets.get(0);
     }
 }

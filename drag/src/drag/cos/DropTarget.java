@@ -10,6 +10,5 @@ public interface DropTarget {
     boolean acceptDrop(Rect rect, DragInfo info);
     void onDrop(Rect rect, DragInfo info);
 
-    // implement in Views
     void getLocationOnScreen(int[] loc);
 }
