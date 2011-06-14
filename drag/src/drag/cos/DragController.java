@@ -116,7 +116,6 @@ public class DragController {
 
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-		    Log.d(TAG, "down");
 		    break;
 		case MotionEvent.ACTION_MOVE:
 		    if (mCurrentDropTarget != target) {
@@ -127,7 +126,6 @@ public class DragController {
 		    target.onDragOver(rect, mDragInfo);
 		    break;
 		case MotionEvent.ACTION_UP:
-		    Log.d(TAG, "up");
 		    endDrag(x, y);
 		    break;
 		case MotionEvent.ACTION_CANCEL:
