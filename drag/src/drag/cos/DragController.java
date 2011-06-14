@@ -54,8 +54,9 @@ public class DragController {
 	mCurrentDropTarget = null; // TODO: find a drop target
 
 	// TODO: create item according to dragInfo
-	mDragItem = new RectView(mHost.getContext(), Color.argb(0x80, 0xff, 0xff, 0x00));
-	mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(20, 30, 50, 100));
+	mDragItem = new View(mHost.getContext());
+	mDragItem.setBackgroundColor(Color.argb(0x80, 0xff, 0xff, 0x00));
+	mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(50, 50, -50, -50));
 	mHost.addView(mDragItem);
 
 	mHost.setDisallowInterceptTouchEvent(false);
@@ -113,25 +114,28 @@ public class DragController {
 	@Override public boolean onTouchEvent(MotionEvent event) {
 	    // Log.d(TAG, "ViewGroup::onTouchEvent("+event+")");
 	    if (! mDisallowInterceptTouchEvent) {
+		int [] dropCoordinates = new int[2];
 		int x = (int)event.getX();
 		int y = (int)event.getY();
 
-		DropTarget target = findDropTarget(x, y);
-		Rect rect = new Rect(x, y, 50+x, 25+y);
+		DropTarget target = findDropTarget(x, y, dropCoordinates);
+		Rect rect = new Rect(dropCoordinates[0], dropCoordinates[1], 50+dropCoordinates[0], 25+dropCoordinates[1]);
 
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 		    break;
 		case MotionEvent.ACTION_MOVE:
-		    if (mCurrentDropTarget != target) {
+		    if (target != null && mCurrentDropTarget != target) {
 			enterDropTarget(target, rect);
 		    }
 
-		    mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(20, 30, (int)event.getX(), (int)event.getY()));
-		    target.onDragOver(rect, mDragInfo);
+		    mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(50, 50, (int)event.getX(), (int)event.getY()));
+		    if (target != null) {
+			target.onDragOver(rect, mDragInfo);
+		    }
 		    break;
 		case MotionEvent.ACTION_UP:
-		    endDrag(x, y);
+		    endDrag(rect.left, rect.top, target);
 		    break;
 		case MotionEvent.ACTION_CANCEL:
 		    Log.d(TAG, "cancel");
@@ -153,13 +157,12 @@ public class DragController {
 	mCurrentDropTarget = target;
     }
 
-    private void endDrag(int x, int y) {
+    private void endDrag(int x, int y, DropTarget target) {
 	if (mDragSource == null){
 	    Log.e(TAG, "is not draging");
 	}else{
 	    Rect rect = new Rect(x, y, x+25, y+50);
 
-	    DropTarget target = findDropTarget(x, y);
 	    if (target != null) {
 		target.onDragExit(mDragInfo);
 		if (target.acceptDrop(rect, mDragInfo)) {
@@ -178,8 +181,28 @@ public class DragController {
 	}
     }
 
-    private DropTarget findDropTarget(int x, int y) {
-	// TODO
-	return mDropTargets.get(0);
+    private DropTarget findDropTarget(int x, int y, int[] dropCoordinates) {
+	int count = mDropTargets.size();
+	for (int i=count-1; i>=0; i--){
+	    DropTarget target = mDropTargets.get(i);
+	    Rect r = new Rect();
+	    target.getHitRect(r);
+	    target.getLocationOnScreen(dropCoordinates);
+	    Log.d(TAG, "["+i+"] x,y="+x+","+y+" rect="+r+", cor=("+dropCoordinates[0]+","+dropCoordinates[1]+")");
+
+	    // r.offset(dropCoordinates[0] - target.getLeft(), dropCoordinates[1] - target.getTop());
+	    if (r.contains(x, y)) {
+		/*
+		dropCoordinates[0] = x - dropCoordinates[0];
+		dropCoordinates[1] = y - dropCoordinates[1];
+		*/
+		dropCoordinates[0] = x - r.left;
+		dropCoordinates[1] = y - r.top;
+
+		Log.d(TAG, "find target "+i+", cor on target="+dropCoordinates[0]+","+dropCoordinates[1]);
+		return target;
+	    }
+	}
+	return null;
     }
 }

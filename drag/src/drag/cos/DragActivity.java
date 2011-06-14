@@ -25,6 +25,7 @@ import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation;
 import android.view.MotionEvent;
+import java.util.Random;
 
 public class DragActivity extends Activity
 {
@@ -37,7 +38,7 @@ public class DragActivity extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	RectView view;
+	View view;
 	ViewGroup.LayoutParams layoutParams;
 	TextView background;
 
@@ -81,13 +82,15 @@ public class DragActivity extends Activity
 	background.setBackgroundColor(Color.WHITE);
 
 	/* item 1 */
-	view = new RectView(this, Color.BLUE);
+	view = new View(this);
+	view.setBackgroundColor(Color.BLUE);
 	view.setLayoutParams(new AbsoluteLayout.LayoutParams(100, 200, 10, 20));
 	view.setOnTouchListener(mDesktop.getOnTouchListener());
         mDesktop.addView(view);
 
 	/* item 2 */
-	view = new RectView(this, Color.RED);
+	view = new View(this);
+	view.setBackgroundColor(Color.RED);
 	view.setLayoutParams(new AbsoluteLayout.LayoutParams(50, 100, 20, 250));
 	view.setOnTouchListener(mDesktop.getOnTouchListener());
 	mDesktop.addView(view);
@@ -116,13 +119,15 @@ public class DragActivity extends Activity
 	background.setBackgroundColor(Color.GRAY);
 
 	/* item 1 */
-	view = new RectView(this, Color.BLUE);
+	view = new View(this);
+	view.setBackgroundColor(Color.BLUE);
 	view.setLayoutParams(new AbsoluteLayout.LayoutParams(5, 10, 10, 20));
 	view.setOnTouchListener(mToolbar.getOnTouchListener());
         mToolbar.addView(view);
 
 	/* item 2 */
-	view = new RectView(this, Color.RED);
+	view = new View(this);
+	view.setBackgroundColor(Color.RED);
 	view.setLayoutParams(new AbsoluteLayout.LayoutParams(50, 100, 50, 30));
 	view.setOnTouchListener(mToolbar.getOnTouchListener());
 	mToolbar.addView(view);
@@ -145,6 +150,8 @@ class ContainerView extends AbsoluteLayout {
     private DragSource mDragSource;
     private DropTarget mDropTarget;
     private DragController mDragController;
+    private static Random s_rand = new Random(108);
+    private int mColor = Color.rgb(s_rand.nextInt(256), s_rand.nextInt(256), s_rand.nextInt(256));
 
     public ContainerView(Context context) {
 	super(context);
@@ -197,7 +204,7 @@ class ContainerView extends AbsoluteLayout {
 
 			mDragItem = item;
 			mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, rect.left, rect.top));
-			mDragItem.setBackgroundColor(Color.GREEN);
+			mDragItem.setBackgroundColor(mColor);
 			addView(mDragItem);
 		    }
 
@@ -215,7 +222,8 @@ class ContainerView extends AbsoluteLayout {
 		    }
 
 		    @Override public void onDrop(Rect rect, DragInfo info) {
-			RectView view = new RectView(getContext(), Color.GREEN);
+			View view = new View(getContext());
+			view.setBackgroundColor(mColor);
 			view.setLayoutParams(new AbsoluteLayout.LayoutParams(rect.width(), rect.height(), rect.left, rect.top));
 			view.setOnTouchListener(getOnTouchListener());
 			addView(view);
@@ -223,6 +231,18 @@ class ContainerView extends AbsoluteLayout {
 
 		    @Override public void getLocationOnScreen(int[] loc) {
 			ContainerView.this.getLocationOnScreen(loc);
+		    }
+
+		    @Override public void getHitRect(Rect outRect) {
+			ContainerView.this.getHitRect(outRect);
+		    }
+
+		    @Override public int getLeft(){
+			return ContainerView.this.getLeft();
+		    }
+
+		    @Override public int getTop(){
+			return ContainerView.this.getTop();
 		    }
 		};
 	}

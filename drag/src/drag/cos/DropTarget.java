@@ -11,4 +11,7 @@ public interface DropTarget {
     void onDrop(Rect rect, DragInfo info);
 
     void getLocationOnScreen(int[] loc);
+    void getHitRect(Rect outRect);
+    int getLeft();
+    int getTop();
 }
