@@ -32,17 +32,15 @@ public class DragController {
 
     private View mHostedView;
     private View mDragItem;
-    private AbsoluteLayout mHost;
+    private HostView mHost;
     private DragInfo mDragInfo;
     private ArrayList<DropTarget> mDropTargets = new ArrayList<DropTarget>();
     private DropTarget mCurrentDropTarget;
     private DragSource mDragSource;
 
-    private OnTouchListener mOnTouchListener = new OnTouchListener();
-
     /* Public */
     public DragController (Context context) {
-	mHost = new AbsoluteLayout(context);
+	mHost = new HostView(context);
     }
 
     public void startDrag(DragSource source, Rect rect, DragInfo dragInfo) throws Exception {
@@ -60,7 +58,8 @@ public class DragController {
 	mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(20, 30, 50, 100));
 	mHost.addView(mDragItem);
 
-	mHost.setOnTouchListener(mOnTouchListener);
+	mHost.setDisallowInterceptTouchEvent(false);
+
 	Log.d(TAG, "startDrag(source="+mDragSource+")");
     }
 
@@ -85,35 +84,60 @@ public class DragController {
     }
 
     /* Private */
-    private class OnTouchListener implements View.OnTouchListener {
-	@Override public boolean onTouch(View v, MotionEvent event) {
-	    int x = (int)event.getX();
-	    int y = (int)event.getY();
+    private class HostView extends AbsoluteLayout {
+	private boolean mDisallowInterceptTouchEvent = true;
 
-	    DropTarget target = findDropTarget(x, y);
-	    Rect rect = new Rect(x, y, 50+x, 25+y);
+	public HostView(Context context) {
+	    super(context);
+	}
 
-	    switch (event.getAction()) {
-	    case MotionEvent.ACTION_DOWN:
-		Log.d(TAG, "down");
-		break;
-	    case MotionEvent.ACTION_MOVE:
-		if (mCurrentDropTarget != target) {
-		    enterDropTarget(target, rect);
-		}
+	public void setDisallowInterceptTouchEvent(boolean disallowIntercept) {
+	    mDisallowInterceptTouchEvent = disallowIntercept;
+	}
 
-		mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(20, 30, (int)event.getX(), (int)event.getY()));
-		target.onDragOver(rect, mDragInfo);
-		break;
-	    case MotionEvent.ACTION_UP:
-		Log.d(TAG, "up");
-		endDrop(x, y);
-		break;
-	    case MotionEvent.ACTION_CANCEL:
-		Log.d(TAG, "cancel");
-		break;
+	@Override public boolean onInterceptTouchEvent (MotionEvent event){
+	    // Log.d(TAG, "ViewGroup::onInterceptTouchEvent("+event+")");
+	    if (mDisallowInterceptTouchEvent) {
+		return false;
+	    }else{
+		onTouchEvent(event); /* XXX: this event will be ignored if don't call onTouchEvent() */
+		return true;
 	    }
-	    return true;
+	}
+
+	@Override public boolean onTouchEvent(MotionEvent event) {
+	    // Log.d(TAG, "ViewGroup::onTouchEvent("+event+")");
+	    if (! mDisallowInterceptTouchEvent) {
+		int x = (int)event.getX();
+		int y = (int)event.getY();
+
+		DropTarget target = findDropTarget(x, y);
+		Rect rect = new Rect(x, y, 50+x, 25+y);
+
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+		    Log.d(TAG, "down");
+		    break;
+		case MotionEvent.ACTION_MOVE:
+		    if (mCurrentDropTarget != target) {
+			enterDropTarget(target, rect);
+		    }
+
+		    mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(20, 30, (int)event.getX(), (int)event.getY()));
+		    target.onDragOver(rect, mDragInfo);
+		    break;
+		case MotionEvent.ACTION_UP:
+		    Log.d(TAG, "up");
+		    endDrag(x, y);
+		    break;
+		case MotionEvent.ACTION_CANCEL:
+		    Log.d(TAG, "cancel");
+		    break;
+		}
+		return true;
+	    }else{
+		return false;
+	    }
 	}
     }
 
@@ -126,7 +150,7 @@ public class DragController {
 	mCurrentDropTarget = target;
     }
 
-    private void endDrop(int x, int y) {
+    private void endDrag(int x, int y) {
 	if (mDragSource == null){
 	    Log.e(TAG, "is not draging");
 	}else{
@@ -143,7 +167,9 @@ public class DragController {
 		}
 	    }
 
-	    mHost.setOnTouchListener(null);
+	    mHost.removeView(mDragItem);
+
+	    mHost.setDisallowInterceptTouchEvent(true);
 	    mDragSource = null;
 	    Log.d(TAG, "set source to " + mDragSource);
 	}

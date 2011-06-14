@@ -62,6 +62,8 @@ public class DragActivity extends Activity
 	mDesktopView.setOnTouchListener(
 					new View.OnTouchListener() {
 					    @Override public boolean onTouch(View v, MotionEvent event) {
+						Log.d(TAG, "desktopView.onTouch("+event.getAction()+")");
+
 						if (event.getAction() == MotionEvent.ACTION_DOWN) {
 						    try {
 							dragController.startDrag(mDesktopView.getDragSource(), null, null);
@@ -69,7 +71,6 @@ public class DragActivity extends Activity
 							Log.d(TAG, "failed to startDrag() "+e);
 						    }
 						}
-						Log.d(TAG, "desktopView.onTouch()");
 						return true;
 					    }
 					}
