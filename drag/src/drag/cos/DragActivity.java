@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
+import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.FrameLayout;
 import android.widget.AbsoluteLayout;
@@ -29,50 +30,123 @@ public class DragActivity extends Activity
 {
     private final static String TAG = "drag";
 
-    private DesktopView mDesktopView;
+    private ContainerView mDesktop;
+    private ContainerView mToolbar;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+	RectView view;
+	ViewGroup.LayoutParams layoutParams;
+	TextView background;
+
         super.onCreate(savedInstanceState);
 
 	DragController dragController = new DragController(this);
 
-	mDesktopView = new DesktopView(this);
-	mDesktopView.setDragController(dragController);
+	LinearLayout layout = new LinearLayout(this);
+	layout.setOrientation(LinearLayout.VERTICAL);
 
-        RectView view = new RectView(this, Color.BLUE);
+	/*
+	 * top bar
+	 */
+	TextView top = new TextView(this);
+	top.setText(R.string.top);
+	top.setGravity(Gravity.CENTER);
+	layout.addView(top);
+	layoutParams = top.getLayoutParams();
+	layoutParams.height = 50;
+	top.setLayoutParams(layoutParams);
+
+	/*
+	 * desktop
+	 */
+	mDesktop = new ContainerView(this);
+	layout.addView(mDesktop);
+	layoutParams = mDesktop.getLayoutParams();
+	layoutParams.width = ViewGroup.LayoutParams.FILL_PARENT;
+	layoutParams.height = 300;
+	mDesktop.setLayoutParams(layoutParams);
+
+	/* background */
+	background = new TextView(this);
+	mDesktop.addView(background);
+	layoutParams = background.getLayoutParams();
+	layoutParams.width = ViewGroup.LayoutParams.FILL_PARENT;
+	layoutParams.height = 300;
+	background.setLayoutParams(layoutParams);
+	background.setText(R.string.desktop);
+	background.setGravity(Gravity.CENTER);
+	background.setBackgroundColor(Color.WHITE);
+
+	/* item 1 */
+	view = new RectView(this, Color.BLUE);
 	view.setLayoutParams(new AbsoluteLayout.LayoutParams(100, 200, 10, 20));
-	view.setOnTouchListener(mDesktopView.getOnTouchListener());
-        mDesktopView.addView(view);
+	view.setOnTouchListener(mDesktop.getOnTouchListener());
+        mDesktop.addView(view);
 
-
+	/* item 2 */
 	view = new RectView(this, Color.RED);
 	view.setLayoutParams(new AbsoluteLayout.LayoutParams(50, 100, 20, 250));
-	view.setOnTouchListener(mDesktopView.getOnTouchListener());
-	mDesktopView.addView(view);
+	view.setOnTouchListener(mDesktop.getOnTouchListener());
+	mDesktop.addView(view);
+
+	/* drag related things */
+	mDesktop.installDragController(dragController);
+
+	/*
+	 * Toolbar
+	 */
+	mToolbar = new ContainerView(this);
+	layout.addView(mToolbar);
+	layoutParams = mToolbar.getLayoutParams();
+	layoutParams.height = 100;
+	mToolbar.setLayoutParams(layoutParams);
+
+	/* background */
+	background = new TextView(this);
+	mToolbar.addView(background);
+	layoutParams = background.getLayoutParams();
+	layoutParams.width = ViewGroup.LayoutParams.FILL_PARENT;
+	layoutParams.height = 100;
+	background.setLayoutParams(layoutParams);
+	background.setText(R.string.toolbar);
+	background.setGravity(Gravity.CENTER);
+	background.setBackgroundColor(Color.GRAY);
+
+	/* item 1 */
+	view = new RectView(this, Color.BLUE);
+	view.setLayoutParams(new AbsoluteLayout.LayoutParams(5, 10, 10, 20));
+	view.setOnTouchListener(mToolbar.getOnTouchListener());
+        mToolbar.addView(view);
+
+	/* item 2 */
+	view = new RectView(this, Color.RED);
+	view.setLayoutParams(new AbsoluteLayout.LayoutParams(50, 100, 50, 30));
+	view.setOnTouchListener(mToolbar.getOnTouchListener());
+	mToolbar.addView(view);
+
+	/* drag related things */
+	mToolbar.installDragController(dragController);
 
 	try {
-	    dragController.setHostedView(mDesktopView);
+	    dragController.setHostedView(layout);
 	} catch (Exception e){
 	    Log.d(TAG, "" + e);
 	}
-
 	setContentView(dragController.getHostView());
-
-	dragController.addDropTarget(mDesktopView.getDropTarget());
     }
 }
 
-class DesktopView extends AbsoluteLayout {
+class ContainerView extends AbsoluteLayout {
     private final static String TAG = "drag";
     private View.OnTouchListener mOnTouchListener;
     private DragSource mDragSource;
     private DropTarget mDropTarget;
     private DragController mDragController;
 
-    public DesktopView(Context context) {
+    public ContainerView(Context context) {
 	super(context);
     }
 
@@ -115,16 +189,20 @@ class DesktopView extends AbsoluteLayout {
     DropTarget getDropTarget() {
 	if (mDropTarget == null) {
 	    mDropTarget = new DropTarget() {
-		    private RectView mDragItem;
+		    private View mDragItem;
 
 		    @Override public void onDragEnter(Rect rect, DragInfo info) {
-			mDragItem = new RectView(getContext(), Color.RED);
-			mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(rect.width(), rect.height(), rect.left, rect.top));
+			TextView item = new TextView(getContext());
+			item.setText(R.string.item_on_drag_source);
+
+			mDragItem = item;
+			mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, rect.left, rect.top));
+			mDragItem.setBackgroundColor(Color.GREEN);
 			addView(mDragItem);
 		    }
 
 		    @Override public void onDragOver(Rect rect, DragInfo info) {
-			mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(rect.width(), rect.height(), rect.left, rect.top));
+			mDragItem.setLayoutParams(new AbsoluteLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, rect.left, rect.top));
 		    }
 
 		    @Override public void onDragExit(DragInfo info) {
@@ -144,10 +222,15 @@ class DesktopView extends AbsoluteLayout {
 		    }
 
 		    @Override public void getLocationOnScreen(int[] loc) {
-			DesktopView.this.getLocationOnScreen(loc);
+			ContainerView.this.getLocationOnScreen(loc);
 		    }
 		};
 	}
 	return mDropTarget;
+    }
+
+    void installDragController(DragController controller) {
+	setDragController(controller);
+	controller.addDropTarget(getDropTarget());
     }
 }

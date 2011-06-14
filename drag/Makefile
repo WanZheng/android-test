@@ -15,6 +15,6 @@ run:	install
 	adb shell am start -n ${PACKAGE}/.${ACTIVITY}
 
 log:	run
-	adb logcat -s ${TAG}:*
+	adb logcat -s ${TAG}:* *:e
 
 force:

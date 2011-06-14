@@ -72,7 +72,12 @@ public class DragController {
 	    throw new Exception("has a hosted view already");
 	}
 	mHostedView = hostedView;
+
 	mHost.addView(hostedView);
+	ViewGroup.LayoutParams layoutParams = hostedView.getLayoutParams();
+	layoutParams.width = ViewGroup.LayoutParams.FILL_PARENT;
+	layoutParams.height = ViewGroup.LayoutParams.FILL_PARENT;
+	hostedView.setLayoutParams(layoutParams);
     }
 
     public void addDropTarget(DropTarget target) {
