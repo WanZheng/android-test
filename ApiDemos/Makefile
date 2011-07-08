@@ -1,9 +1,9 @@
 all:	log
 
-PACKAGE=icon_loader.com
-ACTIVITY=icon_loader
+PACKAGE=com.example.android.apis
+ACTIVITY=ApiDemos
 TAG=icon_loader
-APK=icon_loader-debug.apk
+APK=ApiDemos-debug.apk
 DEVICE=emulator-5554
 #DEVICE=Blade-CM7-Harley
 
