@@ -3,7 +3,7 @@ package statemachine.cos.com;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class StateMachine extends Activity
+public class StateMachineActivity extends Activity
 {
     /** Called when the activity is first created. */
     @Override
