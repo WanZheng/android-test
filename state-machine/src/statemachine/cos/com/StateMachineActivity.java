@@ -17,7 +17,7 @@ public class StateMachineActivity extends Activity
 
     void test() {
 	StateMachine stateMachine = new StateMachine();
-	State rootState = new State(stateMachine);
+	State rootState = new State(stateMachine, "root");
 	State s1 = new State(rootState, "s1");
 	State s2 = new State(rootState, "s2");
 

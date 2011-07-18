@@ -1,7 +1,10 @@
 package statemachine.cos.com;
 
 import java.lang.Object;
+import java.lang.RuntimeException;
 import java.util.ArrayList;
+
+import android.util.Log;
 
 public class State extends Object {
     private final static String TAG = "State";
@@ -11,7 +14,7 @@ public class State extends Object {
     private State mParentState = null;
     private State mInitialState = null;
     private int mDepth = 0;
-    private bool mEntered = false;
+    private boolean mEntered = false;
     private ArrayList<Transition> mTransitions = new ArrayList();
     private ArrayList<State> mChildStates = new ArrayList();
 
@@ -21,8 +24,12 @@ public class State extends Object {
     }
 
     public State(State parentState, String name) {
-	mParentState = parentState;
 	mName = name;
+	parentState.addState(this);
+    }
+
+    public void setInitialState(State state) {
+	mInitialState = state;
     }
 
     public final String getName() {
@@ -49,6 +56,41 @@ public class State extends Object {
 	return mDepth;
     }
 
+    @Override public String toString() {
+	return getClass().getName() + "[" +
+	    "name=" + mName + "]";
+    }
+
+    State enter(boolean autojump) {
+	if (mEntered) {
+	    throw new RuntimeException("re-enter "+toString());
+	}
+	mEntered = true;
+
+	onEnter();
+	resetTransitions();
+	if (autojump) {
+	    if (mInitialState != null) {
+		return mInitialState.enter(true);
+	    }else if (mChildStates.size() == 1) {
+		return mChildStates.get(0);
+	    }else{
+		throw new RuntimeException(toString() + "has no initial-state");
+	    }
+	}else{
+	    return this;
+	}
+    }
+
+    void leave() {
+	if (! mEntered) {
+	    throw new RuntimeException(toString() + "is not entered");
+	}
+	mEntered = false;
+
+	onLeave();
+    }
+
     /* const Event *event, const Transition *transition */
     protected void onEnter() {
 	Log.d(TAG, toString()+".onEnter()");
@@ -58,12 +100,9 @@ public class State extends Object {
 	Log.d(TAG, toString()+".onLeave()");
     }
 
-    private void setInitialState(State state) {
-	mInitialState = state;
-    }
-
     private void addState(State childState) {
 	mChildStates.add(childState);
+	childState.mParentState = this;
     }
 
     private Transition eventTest(Event event) {
@@ -75,36 +114,7 @@ public class State extends Object {
 	}
     }
 
-    private State enter(bool autojump) {
-	if (mEntered) {
-	    throw new Exception("re-enter "+toString());
-	}
-	mEntered = true;
-
-	onEnter();
-	resetTransitions();
-	if (autojump) {
-	    if (mInitialState) {
-		return mInitialState.enter(true);
-	    }else{
-		throw new Exception(toString() + "has no initial-state");
-	    }
-	}else{
-	    return this;
-	}
-    }
-
-    private void leave() {
-	if (! mEntered) {
-	    throw new Exception(toString() + "is not entered");
-	}
-	mEntered = false;
-
-	onLeave();
-    }
-
-    @Override public String toString() {
-	return getClass().getName() + "[" +
-	    "name=" + mName + "]";
+    private void resetTransitions() {
+	// TODO
     }
 }
