@@ -11,9 +11,9 @@ all:	log
 _DEVICE=${${DEVICE}}
 
 # APK=$(shell echo ${ACTIVITY} | tr A-Z a-z)-debug.apk
-APK=${ACTIVITY}-debug.apk
+APK=${PROJECT}-debug.apk
 ADB=adb -s ${_DEVICE}
-TAGS=${TAG}:* *:e
+TAGS=${PROJECT}:* *:e
 
 bin/${APK}:	force
 	ant debug
