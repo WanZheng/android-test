@@ -1,4 +1,8 @@
 package statemachine.cos.com;
 
-public class StateMachine {
+import java.lang.Object;
+
+public class StateMachine extends Object {
+    public StateMachine() {
+    }
 }
