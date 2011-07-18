@@ -10,7 +10,8 @@ all:	log
 
 _DEVICE=${${DEVICE}}
 
-APK=$(shell echo ${ACTIVITY} | tr A-Z a-z)-debug.apk
+# APK=$(shell echo ${ACTIVITY} | tr A-Z a-z)-debug.apk
+APK=${ACTIVITY}-debug.apk
 ADB=adb -s ${_DEVICE}
 TAGS=${TAG}:* *:e
 

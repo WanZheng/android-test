@@ -45,8 +45,8 @@ public class test_for_surfaceview extends Activity
 	layoutParams.gravity = Gravity.CENTER;
 	view.setLayoutParams(layoutParams);
 
-	RotateAnimation animation = new RotateAnimation(-10.0f, 10.0f, layoutParams.width/2, layoutParams.height/2);
-	// TranslateAnimation animation = new TranslateAnimation(-50.0f, -20.0f, 50.0f, 20.0f);
+	// RotateAnimation animation = new RotateAnimation(-10.0f, 10.0f, layoutParams.width/2, layoutParams.height/2);
+	TranslateAnimation animation = new TranslateAnimation(-50.0f, -20.0f, 50.0f, 20.0f);
 
 	animation.setDuration(2 * 1000);
 	animation.setRepeatCount(Animation.INFINITE);
