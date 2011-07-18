@@ -1,7 +1,7 @@
 ###############################
 # device list
 ###############################
-EMU=emulator-5556
+EMU=emulator-5554
 V880=Blade-CM7-Harley
 G2D=0A3AAA1E0200E01F
 
