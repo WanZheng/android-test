@@ -1,7 +1,7 @@
 ###############################
 # device list
 ###############################
-EMU=emulator-5554
+EMU=emulator-5556
 V880=Blade-CM7-Harley
 G2D=0A3AAA1E0200E01F
 
@@ -10,7 +10,7 @@ all:	log
 
 _DEVICE=${${DEVICE}}
 
-APK=${ACTIVITY}-debug.apk
+APK=$(shell echo ${ACTIVITY} | tr A-Z a-z)-debug.apk
 ADB=adb -s ${_DEVICE}
 TAGS=${TAG}:* *:e
 
