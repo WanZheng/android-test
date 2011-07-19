@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import android.util.Log;
 
 public class State extends Object {
-    private final static String TAG = "State";
+    private final static String TAG = "StateMachineActivity";
 
     private String mName;
     private State mParentState = null;
     private State mInitialState = null;
     private int mDepth = 0;
     private boolean mEntered = false;
-    private ArrayList<Transition> mTransitions = new ArrayList();
-    private ArrayList<State> mChildStates = new ArrayList();
+    private ArrayList<Transition> mTransitions = null;
+    private ArrayList<State> mChildStates = null;
 
     public State(StateMachine stateMachine, String name) {
 	mName = name;
@@ -25,6 +25,18 @@ public class State extends Object {
     public State(State parentState, String name) {
 	mName = name;
 	parentState.addState(this);
+    }
+
+    /* for creating the __root__ state only */
+    private State() {
+    }
+
+    static State createRootState() {
+	State state = new State();
+	state.mName = "__root__";
+	state.mDepth = 0;
+
+	return state;
     }
 
     public void setInitialState(State state) {
@@ -39,17 +51,10 @@ public class State extends Object {
 	return mParentState;
     }
 
-    /*
-    public StateMachine getStateMachine() {
-	if (mStateMachine != null) {
-	    return mStateMachine;
-	}else{
-	    return mParentState.getStateMachine();
+    void addTransition(Transition transition) {
+	if (mTransitions == null) {
+	    mTransitions = new ArrayList();
 	}
-    }
-    */
-
-    public void addTransition(Transition transition) {
 	mTransitions.add(transition);
     }
 
@@ -64,19 +69,24 @@ public class State extends Object {
 
     State enter(boolean autojump) {
 	if (mEntered) {
-	    throw new RuntimeException("re-enter "+toString());
+	    throw new RuntimeException("re-enter "+this);
 	}
 	mEntered = true;
 
 	onEnter();
 	resetTransitions();
+
 	if (autojump) {
-	    if (mInitialState != null) {
-		return mInitialState.enter(true);
-	    }else if (mChildStates.size() == 1) {
-		return mChildStates.get(0);
+	    if (mChildStates == null) {
+		return this;
 	    }else{
-		throw new RuntimeException(toString() + "has no initial-state");
+		if (mInitialState != null) {
+		    return mInitialState.enter(true);
+		}else if (mChildStates.size() == 1) {
+		    return mChildStates.get(0).enter(true);
+		}else{
+		    throw new RuntimeException(this + "has no initial-state");
+		}
 	    }
 	}else{
 	    return this;
@@ -93,29 +103,35 @@ public class State extends Object {
     }
 
     void addState(State childState) {
+	if (mChildStates == null) {
+	    mChildStates = new ArrayList();
+	}
 	mChildStates.add(childState);
 	childState.mParentState = this;
+	childState.mDepth = getDepth() + 1;
     }
 
     /* const Event *event, const Transition *transition */
     protected void onEnter() {
-	Log.d(TAG, toString()+".onEnter()");
+	Log.d(TAG, this+".onEnter()");
     }
 
     protected void onLeave() {
-	Log.d(TAG, toString()+".onLeave()");
+	Log.d(TAG, this+".onLeave()");
     }
 
-    private Transition eventTest(Event event) {
-	if (mTransitions.isEmpty()) {
+    Transition eventTest(Event event) {
+	Log.d(TAG, this + "eventTest()");
+	if (mTransitions == null || mTransitions.isEmpty()) {
 	    return null;
 	}else{
 	    // TODO
+	    Log.d(TAG, this + "eventTest() = " + mTransitions.get(0));
 	    return mTransitions.get(0);
 	}
     }
 
-    private void resetTransitions() {
+    void resetTransitions() {
 	// TODO
     }
 }
