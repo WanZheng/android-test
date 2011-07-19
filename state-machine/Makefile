@@ -1,6 +1,6 @@
 PACKAGE=statemachine.cos.com
 ACTIVITY=StateMachineActivity
-PROJECT=StateMachine
+PROJECT=StateMachineActivity
 DEVICE=EMU
 
 include ../build/makefile.inc

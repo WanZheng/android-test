@@ -10,7 +10,6 @@ public class State extends Object {
     private final static String TAG = "State";
 
     private String mName;
-    private StateMachine mStateMachine = null;
     private State mParentState = null;
     private State mInitialState = null;
     private int mDepth = 0;
@@ -19,8 +18,8 @@ public class State extends Object {
     private ArrayList<State> mChildStates = new ArrayList();
 
     public State(StateMachine stateMachine, String name) {
-	mStateMachine = stateMachine;
 	mName = name;
+	stateMachine.addState(this);
     }
 
     public State(State parentState, String name) {
@@ -40,6 +39,7 @@ public class State extends Object {
 	return mParentState;
     }
 
+    /*
     public StateMachine getStateMachine() {
 	if (mStateMachine != null) {
 	    return mStateMachine;
@@ -47,6 +47,7 @@ public class State extends Object {
 	    return mParentState.getStateMachine();
 	}
     }
+    */
 
     public void addTransition(Transition transition) {
 	mTransitions.add(transition);
@@ -91,6 +92,11 @@ public class State extends Object {
 	onLeave();
     }
 
+    void addState(State childState) {
+	mChildStates.add(childState);
+	childState.mParentState = this;
+    }
+
     /* const Event *event, const Transition *transition */
     protected void onEnter() {
 	Log.d(TAG, toString()+".onEnter()");
@@ -98,11 +104,6 @@ public class State extends Object {
 
     protected void onLeave() {
 	Log.d(TAG, toString()+".onLeave()");
-    }
-
-    private void addState(State childState) {
-	mChildStates.add(childState);
-	childState.mParentState = this;
     }
 
     private Transition eventTest(Event event) {
