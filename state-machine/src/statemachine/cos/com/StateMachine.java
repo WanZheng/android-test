@@ -18,7 +18,7 @@ public class StateMachine extends Object {
 	if (mCurrentState != null) {
 	    throw new RuntimeException("StateMachine is running already");
 	}
-	mCurrentState = mRootState.enter(true);
+	mCurrentState = mRootState.enter(new Event("StateMachine startup"), true);
     }
 
     public State getCurrentState() {
@@ -68,12 +68,12 @@ public class StateMachine extends Object {
     
 	n = current_2_transHost.size();
 	for (i=0; i<n; i++) {
-	    current_2_transHost.get(i).leave();
+	    current_2_transHost.get(i).leave(event);
 	}
 
     	for (i=old_state.getDepth() - new_state.getDepth(); i>1; --i) {
     	    old_state = old_state.getParentState();
-    	    old_state.leave();
+    	    old_state.leave(event);
     	}
 
     	for (i=new_state.getDepth() - old_state.getDepth(); i>=0; --i) {
@@ -87,27 +87,27 @@ public class StateMachine extends Object {
 
     	while (old_state.getParentState() != new_state) {
     	    old_state = old_state.getParentState();
-    	    old_state.leave();
+    	    old_state.leave(event);
 
     	    target_2_ancestor.add(0, new_state);
     	    new_state = new_state.getParentState();
     	}
 
     	if(target_2_ancestor.size() == 0){
-	    old_state.getParentState().leave();
+	    old_state.getParentState().leave(event);
 	    target_2_ancestor.add(0, new_state);
 	}
 
-    	trans.action();
+    	trans.action(event);
 
 	n = target_2_ancestor.size();
 	State s;
 	for (i=0; i<n; i++) {
 	    s = target_2_ancestor.get(i);
     	    if (s == trans.getTarget()) {
-    		mCurrentState = s.enter(true);
+    		mCurrentState = s.enter(event, true);
     	    }else{
-    		s.enter(false);
+    		s.enter(event, false);
     	    }
     	}
 

@@ -1,8 +1,7 @@
-package statemachine.cos.com;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import statemachine.cos.com.*;
 
 public class StateMachineActivity extends Activity
 {
@@ -19,6 +18,7 @@ public class StateMachineActivity extends Activity
     }
 
     void test() {
+	Log.d(TAG, "test");
 	StateMachine stateMachine = new StateMachine();
 	State rootState = new State(stateMachine, "root");
 	State s1 = new State(rootState, "s1");
@@ -29,7 +29,17 @@ public class StateMachineActivity extends Activity
 	State s21 = new State(s2, "s21");
 
 	rootState.setInitialState(s1);
+	Log.d(TAG, "1a");
 	Transition trans = new Transition(s1, s2, "s1 -> s2");
+	Log.d(TAG, "1");
+	/*
+	trans.setOnTransitionListener(new Transition.OnTransitionListener() {
+		@Override public void onTransition(Event event, Transition transition) {
+		    Log.d(TAG, "onTransition("+event+", "+transition+")");
+		}
+	    });
+	*/
+	Log.d(TAG, "2");
 
 	stateMachine.start();
 	Log.d(TAG, "current: " + stateMachine.getCurrentState());

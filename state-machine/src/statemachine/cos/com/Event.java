@@ -11,6 +11,6 @@ public class Event extends Object {
 
     @Override public String toString() {
 	return getClass().getName() + "[" +
-	    "name=" + mName + "]";
+	    "name=\"" + mName + "\"]";
     }
 }

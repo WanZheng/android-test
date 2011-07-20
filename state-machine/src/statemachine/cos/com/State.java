@@ -64,16 +64,16 @@ public class State extends Object {
 
     @Override public String toString() {
 	return getClass().getName() + "[" +
-	    "name=" + mName + "]";
+	    "name=\"" + mName + "\"]";
     }
 
-    State enter(boolean autojump) {
+    final State enter(Event event, boolean autojump) {
 	if (mEntered) {
 	    throw new RuntimeException("re-enter "+this);
 	}
 	mEntered = true;
 
-	onEnter();
+	onEnter(event);
 	resetTransitions();
 
 	if (autojump) {
@@ -81,9 +81,9 @@ public class State extends Object {
 		return this;
 	    }else{
 		if (mInitialState != null) {
-		    return mInitialState.enter(true);
+		    return mInitialState.enter(event, true);
 		}else if (mChildStates.size() == 1) {
-		    return mChildStates.get(0).enter(true);
+		    return mChildStates.get(0).enter(event, true);
 		}else{
 		    throw new RuntimeException(this + "has no initial-state");
 		}
@@ -93,13 +93,13 @@ public class State extends Object {
 	}
     }
 
-    void leave() {
+    final void leave(Event event) {
 	if (! mEntered) {
 	    throw new RuntimeException(toString() + "is not entered");
 	}
 	mEntered = false;
 
-	onLeave();
+	onLeave(event);
     }
 
     void addState(State childState) {
@@ -112,16 +112,16 @@ public class State extends Object {
     }
 
     /* const Event *event, const Transition *transition */
-    protected void onEnter() {
-	Log.d(TAG, this+".onEnter()");
+    protected void onEnter(Event event) {
+	Log.d(TAG, this+".onEnter("+event+")");
     }
 
-    protected void onLeave() {
-	Log.d(TAG, this+".onLeave()");
+    protected void onLeave(Event event) {
+	Log.d(TAG, this+".onLeave("+event+")");
     }
 
     Transition eventTest(Event event) {
-	Log.d(TAG, this + "eventTest()");
+	Log.d(TAG, this + "eventTest("+event+")");
 
 	if (mTransitions != null) {
 	    int i, n;
@@ -134,7 +134,7 @@ public class State extends Object {
 			return trans;
 		    }else{
 			/* XXX: Don't return if it is a targetless transition, and do not reset other transitions */
-			trans.action();
+			trans.action(event);
 		    }
 		}
 	    }
