@@ -25,9 +25,7 @@ public class Transition extends Object {
     }
 
     public void setOnTransitionListener(OnTransitionListener listener) {
-	Log.d(TAG, "listener = "+listener);
 	mListener = listener;
-	Log.d(TAG, "listener = "+mListener);
     }
 
     protected void onTransition(Event event) {
