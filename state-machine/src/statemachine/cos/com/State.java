@@ -122,16 +122,33 @@ public class State extends Object {
 
     Transition eventTest(Event event) {
 	Log.d(TAG, this + "eventTest()");
-	if (mTransitions == null || mTransitions.isEmpty()) {
-	    return null;
-	}else{
-	    // TODO
-	    Log.d(TAG, this + "eventTest() = " + mTransitions.get(0));
-	    return mTransitions.get(0);
+
+	if (mTransitions != null) {
+	    int i, n;
+	    Transition trans;
+	    n = mTransitions.size();
+	    for (i=0; i<n; i++) {
+		trans = mTransitions.get(i);
+		if (trans.eventTest(event)) {
+		    if (trans.getTarget() != null) {
+			return trans;
+		    }else{
+			/* XXX: Don't return if it is a targetless transition, and do not reset other transitions */
+			trans.action();
+		    }
+		}
+	    }
 	}
+	return null;
     }
 
     void resetTransitions() {
-	// TODO
+	if (mTransitions != null) {
+	    int i, n;
+	    n = mTransitions.size();
+	    for (i=0; i<n; i++) {
+		mTransitions.get(i).reset();
+	    }
+	}
     }
 }
