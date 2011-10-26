@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<me.cos.update.RandomRectView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
-<me.cos.update.RandomRectView
-    android:layout_centerInParent="true"
-    android:layout_width="300px"
-    android:layout_height="300px"/>
-<me.cos.update.RandomRectView
-    android:layout_centerInParent="true"
-    android:layout_width="200px"
-    android:layout_height="200px"/>
-<TextView  
-    android:layout_width="wrap_content" 
-    android:layout_height="wrap_content" 
-    android:layout_centerInParent="true"
-    android:text="Hello World, Update"
-    />
-</RelativeLayout>
-
+<me.cos.update.MyRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				android:background="#800"
+				android:id="@+id/r9"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				>
+  <me.cos.update.MyRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				  android:background="#800"
+				  android:id="@+id/r0"
+				  android:layout_width="fill_parent"
+				  android:layout_height="400px"
+				  >
+    <me.cos.update.RandomRectView
+	android:id="@+id/r1"
+	android:layout_centerInParent="true"
+	android:layout_width="match_parent"
+	android:layout_height="400px"/>
+    <me.cos.update.RandomRectView
+	android:id="@+id/r2"
+	android:layout_centerInParent="true"
+	android:layout_width="300px"
+	android:layout_height="300px"/>
+    <me.cos.update.RandomRectView
+	android:id="@+id/r3"
+	android:layout_centerInParent="true"
+	android:layout_width="200px"
+	android:layout_height="200px"/>
+    <TextView  
+	android:id="@+id/text"
+	android:layout_width="150px" 
+	android:layout_height="wrap_content" 
+	android:layout_centerInParent="true"
+	android:text="Hello World, Update"
+	/>
+  </me.cos.update.MyRelativeLayout>
+</me.cos.update.MyRelativeLayout>
