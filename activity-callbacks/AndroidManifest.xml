@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.cos"
-      android:versionCode="1"
-      android:versionName="1.0">
-    <application android:label="@string/app_name" >
+          package="com.cos"
+          android:versionCode="1"
+          android:versionName="1.0">
+    <application android:name="MyApplication"
+                 android:label="@string/app_name" >
         <activity android:name="ActivityCallbacks"
                   android:label="@string/app_name">
             <intent-filter>
