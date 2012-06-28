@@ -30,12 +30,8 @@
          scale its UI to larger screens but doesn't make good use of them
          so allow the compatibility mode button to be shown (mostly because
          this is just convenient for testing). -->
-    <supports-screens android:requiresSmallestWidthDp="320"
-            android:compatibleWidthLimitDp="480" />
-
     <application android:label="@string/activity_sample_code"
-            android:icon="@drawable/app_sample_code"
-            android:hardwareAccelerated="true">
+            android:icon="@drawable/app_sample_code">
 
         <activity android:name="Support4Demos">
             <intent-filter>
@@ -223,8 +219,7 @@
                 <category android:name="com.example.android.supportv4.SUPPORT4_SAMPLE_CODE" />
             </intent-filter>
         </activity>
-        <service android:name=".content.LocalServiceBroadcaster$LocalService"
-                android:stopWithTask="true" />
+        <service android:name=".content.LocalServiceBroadcaster$LocalService"/>
 
         <activity android:name=".accessibility.AccessibilityManagerSupportActivity"
                 android:label="@string/accessibility_manager_title">
